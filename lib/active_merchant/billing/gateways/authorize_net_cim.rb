@@ -623,8 +623,18 @@ module ActiveMerchant #:nodoc:
               end
             end
           end
-          xml.tag!('hostedProfileIFrameCommunicatorUrl', options.delete(:hosted_profile_iframe_communicator_url)) if options[:hosted_profile_iframe_communicator_url]
-          xml.tag!('hostedProfileValidationMode', CIM_VALIDATION_MODES.fetch(options.delete(:hosted_profile_validation_mode))) if options[:hosted_profile_validation_mode]
+          if options[:hosted_profile_iframe_communicator_url]
+            xml.tag!('setting') do
+              xml.tag!('settingName', 'hostedProfileIFrameCommunicatorUrl')
+              xml.tag!('settingValue', options.delete(:hosted_profile_iframe_communicator_url))
+            end
+          end
+          if options[:hosted_profile_validation_mode]
+            xml.tag!('setting') do
+              xml.tag!('settingName', 'hostedProfileValidationMode')
+              xml.tag!('settingValue', CIM_VALIDATION_MODES.fetch(options.delete(:hosted_profile_validation_mode)))
+            end
+          end
         end
         raise ArgumentError, "Unknown options: #{options.keys.inspect}" unless options.empty?
         xml.target!
