@@ -40,6 +40,7 @@ module ActiveMerchant #:nodoc:
         :get_customer_profile_ids => 'getCustomerProfileIds',
         :get_customer_payment_profile => 'getCustomerPaymentProfile',
         :get_customer_shipping_address => 'getCustomerShippingAddress',
+        :get_hosted_profile_page => 'getHostedProfilePage',
         :delete_customer_profile => 'deleteCustomerProfile',
         :delete_customer_payment_profile => 'deleteCustomerPaymentProfile',
         :delete_customer_shipping_address => 'deleteCustomerShippingAddress',
@@ -260,6 +261,28 @@ module ActiveMerchant #:nodoc:
 
         request = build_request(:get_customer_shipping_address, options)
         commit(:get_customer_shipping_address, request)
+      end
+
+      # Get the hosted profile page
+      #
+      # ==== options
+      #
+      # * <tt>:ref_id</tt> - Merchant-assigned reference ID for the request. Optional.
+      # * <tt>:customer_profile_id</tt> - Payment gateway assigned ID associated with the customer profile. Required.
+      # * <tt>:hosted_profile_return_url</tt>
+      # * <tt>:hosted_profile_return_url_text</tt>
+      # * <tt>:hosted_profile_heading_bg_color</tt>
+      # * <tt>:hosted_profile_page_border_visible</tt>
+      # * <tt>:hosted_profile_iframe_communicator_url</tt>
+      # * <tt>:hosted_profile_validation_mode</tt>
+      # * <tt>:hosted_profile_billing_address_required</tt>
+      # * <tt>:hosted_profile_card_code_required</tt>
+      #
+      def get_hosted_profile_page(options)
+        requires!(options, :customer_profile_id)
+
+        request = build_request(:get_hosted_profile_page, options)
+        commit(:get_hosted_profile_page, request)
       end
 
       # Updates an existing customer profile.
@@ -576,6 +599,34 @@ module ActiveMerchant #:nodoc:
       def build_get_customer_shipping_address_request(xml, options)
         xml.tag!('customerProfileId', options[:customer_profile_id])
         xml.tag!('customerAddressId', options[:customer_address_id])
+        xml.target!
+      end
+
+      def build_get_hosted_profile_page_request(xml, options)
+        options.delete(:ref_id)
+        options.delete(:login)
+        options.delete(:password)
+        xml.tag!('customerProfileId', options.delete(:customer_profile_id))
+        xml.tag!('hostedProfileSettings') do
+          [
+            :hosted_profile_return_url,
+            :hosted_profile_return_url_text,
+            :hosted_profile_heading_bg_color,
+            :hosted_profile_card_code_required,
+            :hosted_profile_page_border_visible,
+            :hosted_profile_billing_address_required
+          ].each do |key|
+            if !(value = options.delete(key, nil)).nil?
+              xml.tag!('setting') do
+                xml.tag!('settingName', key.to_s.camelize(:lower))
+                xml.tag!('settingValue', value)
+              end
+            end
+          end
+          xml.tag!('hostedProfileIFrameCommunicatorUrl', options.delete(:hosted_profile_iframe_communicator_url)) if options[:hosted_profile_iframe_communicator_url]
+          xml.tag!('hostedProfileValidationMode', CIM_VALIDATION_MODES.fetch(options.delete(:hosted_profile_validation_mode)) if options[:hosted_profile_validation_mode]
+        end
+        raise ArgumentError, "Unknown options: #{options.keys.inspect}" unless options.empty?
         xml.target!
       end
 
