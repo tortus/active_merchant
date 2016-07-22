@@ -616,7 +616,7 @@ module ActiveMerchant #:nodoc:
             :hosted_profile_page_border_visible,
             :hosted_profile_billing_address_required
           ].each do |key|
-            if !(value = options.delete(key, nil)).nil?
+            if !(value = options.delete(key)).nil?
               xml.tag!('setting') do
                 xml.tag!('settingName', key.to_s.camelize(:lower))
                 xml.tag!('settingValue', value)
