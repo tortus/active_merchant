@@ -520,7 +520,7 @@ module ActiveMerchant #:nodoc:
         end
 
         if defined?(Rails)
-          Rails.logger.debug "AuthorizeNetCimGateway#build_request:\n\t#{xml}"
+          Rails.logger.debug "AuthorizeNetCimGateway#build_request '#{action}':\n#{xml.inspect}"
         end
         xml
       end
