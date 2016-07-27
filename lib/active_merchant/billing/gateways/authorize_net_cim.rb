@@ -519,10 +519,10 @@ module ActiveMerchant #:nodoc:
           send("build_#{action}_request", xml, options)
         end
 
-        if defined?(Rails)
-          Rails.logger.debug "AuthorizeNetCimGateway#build_request '#{action}':\n#{xml.inspect}"
-        end
-        xml
+        # if defined?(Rails)
+        #   Rails.logger.debug "AuthorizeNetCimGateway#build_request '#{action}':\n#{xml.inspect}"
+        # end
+        # xml
       end
 
       # Contains the merchant’s payment gateway account authentication information
